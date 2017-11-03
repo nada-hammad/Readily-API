@@ -85,14 +85,15 @@ func (u UserStatus) UpdatedRelative() string {
 }
 
 type Book struct {
-	ID       string   `xml:"id"`
-	Title    string   `xml:"title"`
-	Link     string   `xml:"link"`
-	ImageURL string   `xml:"image_url"`
-	NumPages string   `xml:"num_pages"`
-	Format   string   `xml:"format"`
-	Authors  []Author `xml:"authors>author"`
-	ISBN     string   `xml:"isbn"`
+	ID            string   `xml:"id"`
+	Title         string   `xml:"title"`
+	Link          string   `xml:"link"`
+	ImageURL      string   `xml:"image_url"`
+	NumPages      string   `xml:"num_pages"`
+	Format        string   `xml:"format"`
+	Authors       []Author `xml:"authors>author"`
+	ISBN          string   `xml:"isbn"`
+	AverageRating string   `xml:"average_rating"`
 }
 
 func (b Book) Author() Author {
@@ -181,6 +182,7 @@ func GetBook(id, key string) JSON {
 		"format":   response.Book.Format,
 		"authors":  response.Book.Authors,
 		"isbn":     response.Book.ISBN,
+		"rating":   response.Book.AverageRating,
 	}
 
 	return json

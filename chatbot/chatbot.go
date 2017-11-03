@@ -13,7 +13,7 @@ import (
 	"time"
 
 	cors "github.com/heppu/simple-cors"
-  controller "github.com/YoumnaElghandoor/chatbot-sample/controller"
+	controller "github.com/nada-hammad/readily/controller"
 )
 
 var (
@@ -181,12 +181,12 @@ func handle(w http.ResponseWriter, r *http.Request) {
 }
 func bookHandle(w http.ResponseWriter, r *http.Request) {
 
-//ID := controller.GetBookId("9780552151696","mpTE2wR5Fx0T3GjYwHpug")
-// fmt.Println(ID)
- //  book := controller.GetBook("11125","mpTE2wR5Fx0T3GjYwHpug")
- // fmt.Println(book)
-  review := controller.GetBookReview("11125","mpTE2wR5Fx0T3GjYwHpug")
- fmt.Println(review)
+	ID := controller.GetBookId("9780552151696", "mpTE2wR5Fx0T3GjYwHpug")
+	fmt.Println(ID)
+	book := controller.GetBook("11125", "mpTE2wR5Fx0T3GjYwHpug")
+	fmt.Println(book)
+	// review := controller.GetBookReview("11125", "mpTE2wR5Fx0T3GjYwHpug")
+	// fmt.Println(review)
 }
 
 // Engage Gives control to the chatbot
@@ -196,6 +196,6 @@ func Engage(addr string) error {
 	mux.HandleFunc("/welcome", withLog(handleWelcome))
 	mux.HandleFunc("/chat", withLog(handleChat))
 	mux.HandleFunc("/", withLog(handle))
-  mux.HandleFunc("/book", withLog(bookHandle))
-return http.ListenAndServe(addr, cors.CORS(mux))
+	mux.HandleFunc("/book", withLog(bookHandle))
+	return http.ListenAndServe(addr, cors.CORS(mux))
 }

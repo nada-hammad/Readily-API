@@ -2,15 +2,12 @@ package controller
 
 import (
 	"encoding/xml"
-  "encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
-  "strings"
-  "io"
 )
 
 var (
@@ -166,35 +163,36 @@ func GetBook(id, key string) Book {
 	return response.Book
 }
 
-func GetBookId(isbn, key string) string{
+func GetBookId(isbn, key string) string {
 	uri := apiRoot + "book/isbn/" + isbn + ".xml?key=" + key
 	response := &Response{}
 	getData(uri, response)
 	return response.Book.ID
 }
-type jsonResponse struct {
-		review string
-	}
-func GetBookReview(id, key string) interface{}{
-//http://www.goodreads.com/book/show?format=json&key=mpTE2wR5Fx0T3GjYwHpug&id=11125
-	uri := apiRoot + "book/show?format=json&key=" + key + "&id=11125"
-//+ id
-  fmt.Println(uri)
-  response:= getRequest(uri)
-  dec:=json.NewDecoder(strings.NewReader(response))
- for {
- 		var m jsonResponse
- 		if err := dec.Decode(&m); err == io.EOF {
- 			break
- 		} else if err != nil {
- 			log.Fatal(err)
- 		}
- 		fmt.Printf("%s: %s\n", m.review)
- 	}
-//	response := &Response{}
-//	getData(uri, response)
-	return response
-}
+
+// type jsonResponse struct {
+// 		review string
+// 	}
+// func GetBookReview(id, key string) interface{}{
+// //http://www.goodreads.com/book/show?format=json&key=mpTE2wR5Fx0T3GjYwHpug&id=11125
+// 	uri := apiRoot + "book/show?format=json&key=" + key + "&id=11125"
+// //+ id
+//   fmt.Println(uri)
+//   response:= getRequest(uri)
+//   dec:=json.NewDecoder(strings.NewReader(response))
+//  for {
+//  		var m jsonResponse
+//  		if err := dec.Decode(&m); err == io.EOF {
+//  			break
+//  		} else if err != nil {
+//  			log.Fatal(err)
+//  		}
+//  		fmt.Printf("%s: %s\n", m.review)
+//  	}
+// //	response := &Response{}
+// //	getData(uri, response)
+// 	return response
+// }
 
 func GetLastRead(id, key string, limit int) []Review {
 	l := strconv.Itoa(limit)

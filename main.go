@@ -5,8 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/YoumnaElghandoor/chatbot"
-//	"github.com/YoumnaElghandoor/chatbot-sample/controller"
+	"github.com/nada-hammad/readily/chatbot"
 )
 
 // Autoload environment variables in .env

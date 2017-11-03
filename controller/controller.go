@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
 )
 
 var (
@@ -18,6 +19,7 @@ type Response struct {
 	User    User     `xml:"user"`
 	Book    Book     `xml:"book"`
 	Reviews []Review `xml:"reviews>review"`
+  Author   Author   `xml:"author"`
 }
 
 type User struct {
@@ -153,6 +155,7 @@ func GetUser(id, key string, limit int) *User {
 	}
 
 	return &response.User
+
 }
 
 func GetBook(id, key string) Book {
@@ -168,6 +171,15 @@ func GetBookId(isbn, key string) string {
 	response := &Response{}
 	getData(uri, response)
 	return response.Book.ID
+}
+
+func GetAuthorInfoById(id, key string) Author {
+	uri := apiRoot + "author/show/"  + id + "?format=xml&key=" + key
+//  uri:="https://www.goodreads.com/author/show/18541?format=xml&key=mpTE2wR5Fx0T3GjYwHpug"
+	response := &Response{}
+	getData(uri, response)
+  fmt.Println(response.Author)
+	return response.Author
 }
 
 // type jsonResponse struct {
@@ -197,10 +209,8 @@ func GetBookId(isbn, key string) string {
 func GetLastRead(id, key string, limit int) []Review {
 	l := strconv.Itoa(limit)
 	uri := apiRoot + "review/list/" + id + ".xml?key=" + key + "&v=2&shelf=read&sort=date_read&order=d&per_page=" + l
-
 	response := &Response{}
 	getData(uri, response)
-
 	return response.Reviews
 }
 

@@ -16,6 +16,7 @@ var (
 
 type Response struct {
 	User    User     `xml:"user"`
+	Author  Author   `xml:"author"`
 	Book    Book     `xml:"book"`
 	Reviews []Review `xml:"reviews>review"`
 }
@@ -98,6 +99,7 @@ func (b Book) Author() Author {
 }
 
 type Author struct {
+	Id   string `xml:"id,attr"`
 	ID   string `xml:"id"`
 	Name string `xml:"name"`
 	Link string `xml:"link"`
@@ -204,10 +206,33 @@ func GetLastRead(id, key string, limit int) []Review {
 	return response.Reviews
 }
 
+func GetAuthorIDbyName(name string, key string) string {
+	uri := apiRoot + "api/author_url/" + name + "?key=" + key
+
+	response := &Response{}
+	getData(uri, response)
+
+	fmt.Println(response.Author.Id)
+	// link := response.Author.Link
+
+	// myString := string(res[40:])
+	//
+	// xml := strings.NewReader(myString)
+	// json, err := xj.Convert(xml)
+	// if err != nil {
+	// 	panic("That's embarrassing...")
+	// }
+	//
+	// fmt.Println(json.String())
+
+	return response.Author.Id
+}
+
 // PRIVATE
 
 func getData(uri string, i interface{}) {
 	data := getRequest(uri)
+	// fmt.Println(data)
 	xmlUnmarshal(data, i)
 }
 
@@ -216,6 +241,7 @@ func getRequest(uri string) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// fmt.Print(res)
 
 	body, err := ioutil.ReadAll(res.Body)
 	res.Body.Close()

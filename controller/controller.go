@@ -14,6 +14,8 @@ var (
 	apiRoot = "http://www.goodreads.com/"
 )
 
+type JSON map[string]interface{}
+
 type Response struct {
 	User    User     `xml:"user"`
 	Book    Book     `xml:"book"`
@@ -133,34 +135,55 @@ func (r Review) ReadAtRelative() string {
 
 // PUBLIC
 
-func GetUser(id, key string, limit int) *User {
-	uri := apiRoot + "user/show/" + id + ".xml?key=" + key
-	response := &Response{}
-	getData(uri, response)
+// func GetUser(id, key string, limit int) *User {
+// 	uri := apiRoot + "user/show/" + id + ".xml?key=" + key
+// 	response := &Response{}
+// 	getData(uri, response)
 
-	for i := range response.User.Statuses {
-		status := &response.User.Statuses[i]
-		bookid := status.Book.ID
-		book := GetBook(bookid, key)
-		status.Book = book
-	}
+// 	for i := range response.User.Statuses {
+// 		status := &response.User.Statuses[i]
+// 		bookid := status.Book.ID
+// 		book := GetBook(bookid, key)
+//		// error: because book is now of type json
+// 		status.Book = book
+// 	}
 
-	if len(response.User.Statuses) >= limit {
-		response.User.Statuses = response.User.Statuses[:limit]
-	} else {
-		remaining := limit - len(response.User.Statuses)
-		response.User.LastRead = GetLastRead(id, key, remaining)
-	}
+// 	if len(response.User.Statuses) >= limit {
+// 		response.User.Statuses = response.User.Statuses[:limit]
+// 	} else {
+// 		remaining := limit - len(response.User.Statuses)
+// 		response.User.LastRead = GetLastRead(id, key, remaining)
+// 	}
 
-	return &response.User
-}
+// 	return &response.User
+// }
 
-func GetBook(id, key string) Book {
+// func GetBook(id, key string) Book {
+// 	uri := apiRoot + "book/show/" + id + ".xml?key=" + key
+// 	response := &Response{}
+// 	getData(uri, response)
+
+// 	return response.Book
+// }
+
+// return json object
+func GetBook(id, key string) JSON {
 	uri := apiRoot + "book/show/" + id + ".xml?key=" + key
 	response := &Response{}
 	getData(uri, response)
 
-	return response.Book
+	json := JSON{
+		"id":       response.Book.ID,
+		"title":    response.Book.Title,
+		"link":     response.Book.Link,
+		"imageURL": response.Book.ImageURL,
+		"numPages": response.Book.NumPages,
+		"format":   response.Book.Format,
+		"authors":  response.Book.Authors,
+		"isbn":     response.Book.ISBN,
+	}
+
+	return json
 }
 
 func GetBookId(isbn, key string) string {

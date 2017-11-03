@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -166,6 +167,28 @@ func (r Review) ReadAtRelative() string {
 
 // 	return response.Book
 // }
+
+// return json object
+func GetBookByTitle(title, key string) JSON {
+	title = url.QueryEscape(title)
+	uri := apiRoot + "book/title.xml?key=" + key + "&title=" + title
+	response := &Response{}
+	getData(uri, response)
+
+	json := JSON{
+		"id":       response.Book.ID,
+		"title":    response.Book.Title,
+		"link":     response.Book.Link,
+		"imageURL": response.Book.ImageURL,
+		"numPages": response.Book.NumPages,
+		"format":   response.Book.Format,
+		"authors":  response.Book.Authors,
+		"isbn":     response.Book.ISBN,
+		"rating":   response.Book.AverageRating,
+	}
+
+	return json
+}
 
 // return json object
 func GetBook(id, key string) JSON {

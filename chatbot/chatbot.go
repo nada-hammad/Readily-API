@@ -180,13 +180,15 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, body)
 }
 func bookHandle(w http.ResponseWriter, r *http.Request) {
-
-	ID := controller.GetBookId("9780552151696", "mpTE2wR5Fx0T3GjYwHpug")
-	fmt.Println(ID)
-	book := controller.GetBook("11125", "mpTE2wR5Fx0T3GjYwHpug")
-	fmt.Println(book)
+	//
+	// ID := controller.GetBookId("9780552151696", "mpTE2wR5Fx0T3GjYwHpug")
+	// fmt.Println(ID)
+	// book := controller.GetBook("11125", "mpTE2wR5Fx0T3GjYwHpug")
+	// fmt.Println(book)
+    controller.GetRecentReviews("mpTE2wR5Fx0T3GjYwHpug")
+ //fmt.Println(review)
 	// review := controller.GetBookReview("11125", "mpTE2wR5Fx0T3GjYwHpug")
-	// fmt.Println(review)
+
 }
 
 // Engage Gives control to the chatbot
@@ -197,5 +199,6 @@ func Engage(addr string) error {
 	mux.HandleFunc("/chat", withLog(handleChat))
 	mux.HandleFunc("/", withLog(handle))
 	mux.HandleFunc("/book", withLog(bookHandle))
+	mux.HandleFunc("/review", withLog(bookHandle))
 	return http.ListenAndServe(addr, cors.CORS(mux))
 }

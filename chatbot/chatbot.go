@@ -34,7 +34,7 @@ type (
 	Session map[string]interface{}
 
 	// JSON Holds a JSON object
-	JSON map[string]interface{}
+	//JSON map[string]interface{}
 
 	// Processor Alias for Process func
 	Processor func(session Session, message string) (string, error)
@@ -91,7 +91,7 @@ func withLog(fn http.HandlerFunc) http.HandlerFunc {
 }
 
 // writeJSON Writes the JSON equivilant for data into ResponseWriter w
-func writeJSON(w http.ResponseWriter, data JSON) {
+func writeJSON(w http.ResponseWriter, data controller.JSON) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
@@ -112,7 +112,7 @@ func handleWelcome(w http.ResponseWriter, r *http.Request) {
 	sessions[uuid] = Session{}
 
 	// Write a JSON containg the welcome message and the generated UUID
-	writeJSON(w, JSON{
+	writeJSON(w, controller.JSON{
 		"uuid":    uuid,
 		"message": WelcomeMessage,
 	})
@@ -140,7 +140,7 @@ func handleChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Parse the JSON string in the body of the request
-	data := JSON{}
+	data := controller.JSON{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		http.Error(w, fmt.Sprintf("Couldn't decode JSON: %v.", err), http.StatusBadRequest)
 		return
@@ -162,7 +162,7 @@ func handleChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Write a JSON containg the processed response
-	writeJSON(w, JSON{
+	writeJSON(w, controller.JSON{
 		"message": message,
 	})
 }
@@ -181,15 +181,17 @@ func handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func bookHandle(w http.ResponseWriter, r *http.Request) {
-	//ID := controller.GetBookId("9780552151696", "mpTE2wR5Fx0T3GjYwHpug")
-	//fmt.Println(ID)
-	// book := controller.GetBook("11125", "mpTE2wR5Fx0T3GjYwHpug")
+	// book := controller.GetBookByTitle("Harry potter", "mpTE2wR5Fx0T3GjYwHpug")
 	// fmt.Println(book)
-	// review := controller.GetBookReview("11125", "mpTE2wR5Fx0T3GjYwHpug")
-	// fmt.Println(review)
+	// writeJSON(w, book)
 
-	book := controller.GetBookByTitle("Harry potter", "mpTE2wR5Fx0T3GjYwHpug")
-	fmt.Println(book)
+	// author := controller.GetAuthorInfo("Dan Brown", "mpTE2wR5Fx0T3GjYwHpug")
+	// fmt.Println(author)
+	// writeJSON(w, author)
+
+	// reviews := controller.GetRecentReviews("mpTE2wR5Fx0T3GjYwHpug")
+	// fmt.Println(reviews)
+	// writeJSON(w, reviews)
 }
 
 // Engage Gives control to the chatbot

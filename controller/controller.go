@@ -16,6 +16,7 @@ var (
 
 type Response struct {
 	User    User     `xml:"user"`
+	Author  Author   `xml:"author"`
 	Book    Book     `xml:"book"`
 	Reviews []Review `xml:"reviews>review"`
 }
@@ -98,6 +99,7 @@ func (b Book) Author() Author {
 }
 
 type Author struct {
+	Id   string `xml:"id,attr"`
 	ID   string `xml:"id"`
 	Name string `xml:"name"`
 	Link string `xml:"link"`
@@ -171,6 +173,7 @@ func GetBookId(isbn, key string) string {
 	getData(uri, response)
 	return response.Book.ID
 }
+
 func GetRecentReviews( key string) []Review {
 	uri := apiRoot + "review/recent_reviews?format=xml&key=" + key
 	response := &Response{}
@@ -180,6 +183,7 @@ func GetRecentReviews( key string) []Review {
   fmt.Println(response.Reviews[0].Body)
 	return response.Reviews
 }
+
 // type jsonResponse struct {
 // 		review string
 // 	}
@@ -214,10 +218,50 @@ func GetLastRead(id, key string, limit int) []Review {
 	return response.Reviews
 }
 
+func GetAuthorIDbyName(name string, key string) string {
+	uri := apiRoot + "api/author_url/" + name + "?key=" + key
+
+	response := &Response{}
+	getData(uri, response)
+
+	fmt.Println(response.Author.Id)
+	// link := response.Author.Link
+
+	// myString := string(res[40:])
+	//
+	// xml := strings.NewReader(myString)
+	// json, err := xj.Convert(xml)
+	// if err != nil {
+	// 	panic("That's embarrassing...")
+	// }
+	//
+	// fmt.Println(json.String())
+
+	return response.Author.Id
+}
+
+func GetAuthorInfoById(id, key string) Author {
+	uri := apiRoot + "author/show/" + id + "?format=xml&key=" + key
+	//  uri:="https://www.goodreads.com/author/show/18541?format=xml&key=mpTE2wR5Fx0T3GjYwHpug"
+	response := &Response{}
+	getData(uri, response)
+	fmt.Println(response.Author)
+	return response.Author
+}
+
+func GetAuthorInfo(name string, key string) Author {
+
+	id := GetAuthorIDbyName(name, key)
+	author := GetAuthorInfoById(id, key)
+
+	return author
+}
+
 // PRIVATE
 
 func getData(uri string, i interface{}) {
 	data := getRequest(uri)
+	// fmt.Println(data)
 	xmlUnmarshal(data, i)
 }
 
@@ -226,6 +270,7 @@ func getRequest(uri string) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// fmt.Print(res)
 
 	body, err := ioutil.ReadAll(res.Body)
 	res.Body.Close()

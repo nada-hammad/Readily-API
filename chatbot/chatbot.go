@@ -179,14 +179,18 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html")
 	fmt.Fprintln(w, body)
 }
+
 func bookHandle(w http.ResponseWriter, r *http.Request) {
 
-	ID := controller.GetBookId("9780552151696", "mpTE2wR5Fx0T3GjYwHpug")
-	fmt.Println(ID)
-	book := controller.GetBook("11125", "mpTE2wR5Fx0T3GjYwHpug")
-	fmt.Println(book)
+	//ID := controller.GetBookId("9780552151696", "mpTE2wR5Fx0T3GjYwHpug")
+	//fmt.Println(ID)
+	// book := controller.GetBook("11125", "mpTE2wR5Fx0T3GjYwHpug")
+	// fmt.Println(book)
 	// review := controller.GetBookReview("11125", "mpTE2wR5Fx0T3GjYwHpug")
 	// fmt.Println(review)
+
+	book := controller.GetBookByTitle("Harry potter", "mpTE2wR5Fx0T3GjYwHpug")
+	fmt.Println(book)
 }
 
 // Engage Gives control to the chatbot

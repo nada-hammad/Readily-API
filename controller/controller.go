@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -13,6 +14,8 @@ import (
 var (
 	apiRoot = "http://www.goodreads.com/"
 )
+
+type JSON map[string]interface{}
 
 type Response struct {
 	User    User     `xml:"user"`
@@ -83,14 +86,15 @@ func (u UserStatus) UpdatedRelative() string {
 }
 
 type Book struct {
-	ID       string   `xml:"id"`
-	Title    string   `xml:"title"`
-	Link     string   `xml:"link"`
-	ImageURL string   `xml:"image_url"`
-	NumPages string   `xml:"num_pages"`
-	Format   string   `xml:"format"`
-	Authors  []Author `xml:"authors>author"`
-	ISBN     string   `xml:"isbn"`
+	ID            string   `xml:"id"`
+	Title         string   `xml:"title"`
+	Link          string   `xml:"link"`
+	ImageURL      string   `xml:"image_url"`
+	NumPages      string   `xml:"num_pages"`
+	Format        string   `xml:"format"`
+	Authors       []Author `xml:"authors>author"`
+	ISBN          string   `xml:"isbn"`
+	AverageRating string   `xml:"average_rating"`
 }
 
 func (b Book) Author() Author {
@@ -133,34 +137,78 @@ func (r Review) ReadAtRelative() string {
 
 // PUBLIC
 
-func GetUser(id, key string, limit int) *User {
-	uri := apiRoot + "user/show/" + id + ".xml?key=" + key
+// func GetUser(id, key string, limit int) *User {
+// 	uri := apiRoot + "user/show/" + id + ".xml?key=" + key
+// 	response := &Response{}
+// 	getData(uri, response)
+
+// 	for i := range response.User.Statuses {
+// 		status := &response.User.Statuses[i]
+// 		bookid := status.Book.ID
+// 		book := GetBook(bookid, key)
+//		// error: because book is now of type json
+// 		status.Book = book
+// 	}
+
+// 	if len(response.User.Statuses) >= limit {
+// 		response.User.Statuses = response.User.Statuses[:limit]
+// 	} else {
+// 		remaining := limit - len(response.User.Statuses)
+// 		response.User.LastRead = GetLastRead(id, key, remaining)
+// 	}
+
+// 	return &response.User
+// }
+
+// func GetBook(id, key string) Book {
+// 	uri := apiRoot + "book/show/" + id + ".xml?key=" + key
+// 	response := &Response{}
+// 	getData(uri, response)
+
+// 	return response.Book
+// }
+
+// return json object
+func GetBookByTitle(title, key string) JSON {
+	title = url.QueryEscape(title)
+	uri := apiRoot + "book/title.xml?key=" + key + "&title=" + title
 	response := &Response{}
 	getData(uri, response)
 
-	for i := range response.User.Statuses {
-		status := &response.User.Statuses[i]
-		bookid := status.Book.ID
-		book := GetBook(bookid, key)
-		status.Book = book
+	json := JSON{
+		"id":       response.Book.ID,
+		"title":    response.Book.Title,
+		"link":     response.Book.Link,
+		"imageURL": response.Book.ImageURL,
+		"numPages": response.Book.NumPages,
+		"format":   response.Book.Format,
+		"authors":  response.Book.Authors,
+		"isbn":     response.Book.ISBN,
+		"rating":   response.Book.AverageRating,
 	}
 
-	if len(response.User.Statuses) >= limit {
-		response.User.Statuses = response.User.Statuses[:limit]
-	} else {
-		remaining := limit - len(response.User.Statuses)
-		response.User.LastRead = GetLastRead(id, key, remaining)
-	}
-
-	return &response.User
+	return json
 }
 
-func GetBook(id, key string) Book {
+// return json object
+func GetBook(id, key string) JSON {
 	uri := apiRoot + "book/show/" + id + ".xml?key=" + key
 	response := &Response{}
 	getData(uri, response)
 
-	return response.Book
+	json := JSON{
+		"id":       response.Book.ID,
+		"title":    response.Book.Title,
+		"link":     response.Book.Link,
+		"imageURL": response.Book.ImageURL,
+		"numPages": response.Book.NumPages,
+		"format":   response.Book.Format,
+		"authors":  response.Book.Authors,
+		"isbn":     response.Book.ISBN,
+		"rating":   response.Book.AverageRating,
+	}
+
+	return json
 }
 
 func GetBookId(isbn, key string) string {

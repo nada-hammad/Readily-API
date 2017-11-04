@@ -106,10 +106,12 @@ type Author struct {
 }
 
 type Review struct {
-	Book   Book   `xml:"book"`
+//	Book   Book   `xml:"book"`
 	Rating int    `xml:"rating"`
 	ReadAt string `xml:"read_at"`
 	Link   string `xml:"link"`
+  Body   string  `xml:"body"`
+  BookTitle string `xml:"book>title"`
 }
 
 func (r Review) FullStars() []bool {
@@ -170,6 +172,16 @@ func GetBookId(isbn, key string) string {
 	response := &Response{}
 	getData(uri, response)
 	return response.Book.ID
+}
+
+func GetRecentReviews( key string) []Review {
+	uri := apiRoot + "review/recent_reviews?format=xml&key=" + key
+	response := &Response{}
+	getData(uri, response)
+  //fmt.Println("Review")
+  fmt.Println(response.Reviews[0].BookTitle)
+  fmt.Println(response.Reviews[0].Body)
+	return response.Reviews
 }
 
 // type jsonResponse struct {

@@ -21,18 +21,22 @@ type Response struct {
 }
 
 type Book struct {
-	ID            string   `xml:"id"`
-	Title         string   `xml:"title"`
-	Link          string   `xml:"link"`
-	ImageURL      string   `xml:"image_url"`
-	NumPages      string   `xml:"num_pages"`
-	Format        string   `xml:"format"`
-	Authors       []Author `xml:"authors>author"`
-	ISBN          string   `xml:"isbn"`
-	AverageRating string   `xml:"average_rating"`
+	ID              string   `xml:"id"`
+	Title           string   `xml:"title"`
+	Link            string   `xml:"link"`
+	ImageURL        string   `xml:"image_url"`
+	NumPages        string   `xml:"num_pages"`
+	Format          string   `xml:"format"`
+	Authors         []string `xml:"authors>author>name"`
+	ISBN            string   `xml:"isbn"`
+	AverageRating   string   `xml:"average_rating"`
+	PublicationYear string   `xml:"publication_year"`
+	Description     string   `xml:"description"`
+	LanguageCode    string   `xml:"language_code"`
+	Publisher       string   `xml:"publisher"`
 }
 
-func (b Book) Author() Author {
+func (b Book) Author() string {
 	return b.Authors[0]
 }
 
@@ -60,15 +64,18 @@ func GetBookByTitle(title, key string) JSON {
 	getData(uri, response)
 
 	book := JSON{
-		"id":       response.Book.ID,
-		"title":    response.Book.Title,
-		"link":     response.Book.Link,
-		"imageURL": response.Book.ImageURL,
-		"numPages": response.Book.NumPages,
-		"format":   response.Book.Format,
-		"authors":  response.Book.Authors,
-		"isbn":     response.Book.ISBN,
-		"rating":   response.Book.AverageRating,
+		"title":           response.Book.Title,
+		"link":            response.Book.Link,
+		"imageURL":        response.Book.ImageURL,
+		"numPages":        response.Book.NumPages,
+		"format":          response.Book.Format,
+		"authors":         response.Book.Authors,
+		"isbn":            response.Book.ISBN,
+		"rating":          response.Book.AverageRating,
+		"publicationYear": response.Book.PublicationYear,
+		"description":     response.Book.Description,
+		"language_code":   response.Book.LanguageCode,
+		"publisher":       response.Book.Publisher,
 	}
 
 	return book
@@ -89,15 +96,19 @@ func GetBook(id, key string) JSON {
 	getData(uri, response)
 
 	book := JSON{
-		"id":       response.Book.ID,
-		"title":    response.Book.Title,
-		"link":     response.Book.Link,
-		"imageURL": response.Book.ImageURL,
-		"numPages": response.Book.NumPages,
-		"format":   response.Book.Format,
-		"authors":  response.Book.Authors,
-		"isbn":     response.Book.ISBN,
-		"rating":   response.Book.AverageRating,
+		"id":              response.Book.ID,
+		"title":           response.Book.Title,
+		"link":            response.Book.Link,
+		"imageURL":        response.Book.ImageURL,
+		"numPages":        response.Book.NumPages,
+		"format":          response.Book.Format,
+		"authors":         response.Book.Authors,
+		"isbn":            response.Book.ISBN,
+		"rating":          response.Book.AverageRating,
+		"publicationYear": response.Book.PublicationYear,
+		"description":     response.Book.Description,
+		"language_code":   response.Book.LanguageCode,
+		"publisher":       response.Book.Publisher,
 	}
 
 	return book

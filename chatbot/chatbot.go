@@ -181,9 +181,10 @@ func handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func bookHandle(w http.ResponseWriter, r *http.Request) {
-	// book := controller.GetBookByTitle("Harry potter", "mpTE2wR5Fx0T3GjYwHpug")
-	// fmt.Println(book)
-	// writeJSON(w, book)
+	book := controller.GetBookByTitle("Harry potter", "mpTE2wR5Fx0T3GjYwHpug")
+	//book := controller.GetBookByTitle("The Autobiography of Malcolm X", "mpTE2wR5Fx0T3GjYwHpug")
+	fmt.Println(book)
+	writeJSON(w, book)
 
 	// author := controller.GetAuthorInfo("Dan Brown", "mpTE2wR5Fx0T3GjYwHpug")
 	// fmt.Println(author)

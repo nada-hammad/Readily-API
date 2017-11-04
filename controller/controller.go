@@ -229,12 +229,20 @@ func GetAuthorIDbyName(name string, key string) string {
 }
 
 func GetAuthorInfoById(id, key string) Author {
-	uri := apiRoot + "author/show/"  + id + "?format=xml&key=" + key
-//  uri:="https://www.goodreads.com/author/show/18541?format=xml&key=mpTE2wR5Fx0T3GjYwHpug"
+	uri := apiRoot + "author/show/" + id + "?format=xml&key=" + key
+	//  uri:="https://www.goodreads.com/author/show/18541?format=xml&key=mpTE2wR5Fx0T3GjYwHpug"
 	response := &Response{}
 	getData(uri, response)
-  fmt.Println(response.Author)
+	fmt.Println(response.Author)
 	return response.Author
+}
+
+func GetAuthorInfo(name string, key string) Author {
+
+	id := GetAuthorIDbyName(name, key)
+	author := GetAuthorInfoById(id, key)
+
+	return author
 }
 
 // PRIVATE

@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
 )
 
 var (
@@ -17,9 +16,9 @@ var (
 
 type Response struct {
 	User    User     `xml:"user"`
+	Author  Author   `xml:"author"`
 	Book    Book     `xml:"book"`
 	Reviews []Review `xml:"reviews>review"`
-  Author   Author   `xml:"author"`
 }
 
 type User struct {
@@ -100,6 +99,7 @@ func (b Book) Author() Author {
 }
 
 type Author struct {
+	Id   string `xml:"id,attr"`
 	ID   string `xml:"id"`
 	Name string `xml:"name"`
 	Link string `xml:"link"`
@@ -155,7 +155,6 @@ func GetUser(id, key string, limit int) *User {
 	}
 
 	return &response.User
-
 }
 
 func GetBook(id, key string) Book {
@@ -171,15 +170,6 @@ func GetBookId(isbn, key string) string {
 	response := &Response{}
 	getData(uri, response)
 	return response.Book.ID
-}
-
-func GetAuthorInfoById(id, key string) Author {
-	uri := apiRoot + "author/show/"  + id + "?format=xml&key=" + key
-//  uri:="https://www.goodreads.com/author/show/18541?format=xml&key=mpTE2wR5Fx0T3GjYwHpug"
-	response := &Response{}
-	getData(uri, response)
-  fmt.Println(response.Author)
-	return response.Author
 }
 
 // type jsonResponse struct {
@@ -209,15 +199,49 @@ func GetAuthorInfoById(id, key string) Author {
 func GetLastRead(id, key string, limit int) []Review {
 	l := strconv.Itoa(limit)
 	uri := apiRoot + "review/list/" + id + ".xml?key=" + key + "&v=2&shelf=read&sort=date_read&order=d&per_page=" + l
+
 	response := &Response{}
 	getData(uri, response)
+
 	return response.Reviews
+}
+
+func GetAuthorIDbyName(name string, key string) string {
+	uri := apiRoot + "api/author_url/" + name + "?key=" + key
+
+	response := &Response{}
+	getData(uri, response)
+
+	fmt.Println(response.Author.Id)
+	// link := response.Author.Link
+
+	// myString := string(res[40:])
+	//
+	// xml := strings.NewReader(myString)
+	// json, err := xj.Convert(xml)
+	// if err != nil {
+	// 	panic("That's embarrassing...")
+	// }
+	//
+	// fmt.Println(json.String())
+
+	return response.Author.Id
+}
+
+func GetAuthorInfoById(id, key string) Author {
+	uri := apiRoot + "author/show/"  + id + "?format=xml&key=" + key
+//  uri:="https://www.goodreads.com/author/show/18541?format=xml&key=mpTE2wR5Fx0T3GjYwHpug"
+	response := &Response{}
+	getData(uri, response)
+  fmt.Println(response.Author)
+	return response.Author
 }
 
 // PRIVATE
 
 func getData(uri string, i interface{}) {
 	data := getRequest(uri)
+	// fmt.Println(data)
 	xmlUnmarshal(data, i)
 }
 
@@ -226,6 +250,7 @@ func getRequest(uri string) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// fmt.Print(res)
 
 	body, err := ioutil.ReadAll(res.Body)
 	res.Body.Close()

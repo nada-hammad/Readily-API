@@ -19,6 +19,7 @@ import (
 var (
 	// WelcomeMessage A constant to hold the welcome message
 	WelcomeMessage = "Welcome, what do you want to order?"
+	key            = "mpTE2wR5Fx0T3GjYwHpug"
 
 	// sessions = {
 	//   "uuid1" = Session{...},
@@ -41,38 +42,31 @@ type (
 )
 
 func sampleProcessor(session Session, message string) (string, error) {
-	// Make sure a history key is defined in the session which points to a slice of strings
-	_, historyFound := session["history"]
-	if !historyFound {
-		session["history"] = []string{}
-	}
-
-	// Fetch the history from session and cast it to an array of strings
-	history, _ := session["history"].([]string)
-
-	// Make sure the message is unique in history
-	for _, m := range history {
-		if strings.EqualFold(m, message) {
-			return "", fmt.Errorf("You've already ordered %s before!", message)
+	isGetBook := strings.HasPrefix(strings.ToLower(message), "get book")
+	if isGetBook {
+		bookTitle := strings.TrimPrefix(message, "get book")
+		if len(bookTitle) != 0 {
+			book := controller.GetBookByTitle(bookTitle, key)
+			session["book"] = book // book is a JSON map
+			return fmt.Sprintf("OK, I found the %s", book["title"]), nil
+		} else {
+			return "", fmt.Errorf("Please enter a book title!")
 		}
 	}
 
-	// Add the message in the parsed body to the messages in the session
-	history = append(history, message)
-
-	// Form a sentence out of the history in the form Message 1, Message 2, and Message 3
-	l := len(history)
-	wordsForSentence := make([]string, l)
-	copy(wordsForSentence, history)
-	if l > 1 {
-		wordsForSentence[l-1] = "and " + wordsForSentence[l-1]
+	isGetLatestReviews := strings.HasPrefix(strings.ToLower(message), "get latest reviews")
+	if isGetLatestReviews {
+		reviews := controller.GetRecentReviews(key)
+		reviewsArr := reviews["reviews"].([]controller.Review)
+		allReviews := ""
+		for _, review := range reviewsArr {
+			allReviews += fmt.Sprintf("Book title: %s \n", review.BookTitle)
+			allReviews += fmt.Sprintf("Body: %s \n", review.Body)
+		}
+		return allReviews, nil
 	}
-	sentence := strings.Join(wordsForSentence, ", ")
 
-	// Save the updated history to the session
-	session["history"] = history
-
-	return fmt.Sprintf("So, you want %s! What else?", strings.ToLower(sentence)), nil
+	return fmt.Sprintf("So, you want %s! What else?", strings.ToLower("test")), nil
 }
 
 // withLog Wraps HandlerFuncs to log requests to Stdout

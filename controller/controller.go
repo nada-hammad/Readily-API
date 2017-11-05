@@ -12,7 +12,7 @@ var (
 	apiRoot = "http://www.goodreads.com/"
 )
 
-// JSON Holds a JSON object
+// JSON holds a JSON object
 type JSON map[string]interface{}
 
 type Response struct {
@@ -24,8 +24,6 @@ type Response struct {
 type Book struct {
 	ID              string   `xml:"id"`
 	Title           string   `xml:"title"`
-	Link            string   `xml:"link"`
-	ImageURL        string   `xml:"image_url"`
 	NumPages        string   `xml:"num_pages"`
 	Format          string   `xml:"format"`
 	Authors         []string `xml:"authors>author>name"`
@@ -38,13 +36,8 @@ type Book struct {
 	SimilarBooks    []string `xml:"similar_books>book>title"`
 }
 
-func (b Book) Author() string {
-	return b.Authors[0]
-}
-
 type Author struct {
 	Id         string   `xml:"id,attr"`
-	ID         string   `xml:"id"`
 	Name       string   `xml:"name"`
 	WorksCount string   `xml:"works_count"`
 	Gender     string   `xml:"gender"`
@@ -67,8 +60,6 @@ func GetBookByTitle(title, key string) JSON {
 
 	book := JSON{
 		"title":           response.Book.Title,
-		"link":            response.Book.Link,
-		"imageURL":        response.Book.ImageURL,
 		"numPages":        response.Book.NumPages,
 		"format":          response.Book.Format,
 		"authors":         response.Book.Authors,
@@ -101,8 +92,6 @@ func GetBook(id, key string) JSON {
 	book := JSON{
 		"id":              response.Book.ID,
 		"title":           response.Book.Title,
-		"link":            response.Book.Link,
-		"imageURL":        response.Book.ImageURL,
 		"numPages":        response.Book.NumPages,
 		"format":          response.Book.Format,
 		"authors":         response.Book.Authors,

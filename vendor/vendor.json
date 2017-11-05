@@ -1,0 +1,26 @@
+
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "66FySld60ai7A8X83tqwih+Iguc=",
+			"path": "github.com/heppu/simple-cors",
+			"revision": "543cdec07e0c196abd48c5d966c0a0684cc47308",
+			"revisionTime": "2017-03-13T07:41:01Z"
+		},
+		{
+			"checksumSHA1": "qzl/TNo4WnfR+PZRfk3iFHg68sM=",
+			"path": "github.com/joho/godotenv",
+			"revision": "325433c502d409f3c3dc820098fb0cfe38d98dc7",
+			"revisionTime": "2017-03-28T20:01:54Z"
+		},
+		{
+			"checksumSHA1": "UE4lhbPYYWEhqHXQk24OA73m5+8=",
+			"path": "github.com/joho/godotenv/autoload",
+			"revision": "325433c502d409f3c3dc820098fb0cfe38d98dc7",
+			"revisionTime": "2017-03-28T20:01:54Z"
+		}
+	],
+	"rootPath": "github.com/nada-hammad/readily"
+}

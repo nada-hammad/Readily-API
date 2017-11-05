@@ -35,10 +35,11 @@ var (
 		"1.10- get book publisher (after using command 1)\n" +
 		"1.11- get book similar books (after using command 1)\n" +
 		"2.0-  get author <authorName>\n" +
-		"2.1-  get author works count\n" +
-		"2.2-  get author gender\n" +
-		"2.3-  get author hometown\n" +
-		"2.4-  get author book titles\n" +
+		"2.1-  get author number of works\n" +
+		"2.2-  get author works\n" +
+		"2.3-  get author gender\n" +
+		"2.4-  get author hometown\n" +
+		"2.5-  get author info\n" +
 		"3-    get latest reviews\n"
 
 	key = "mpTE2wR5Fx0T3GjYwHpug"

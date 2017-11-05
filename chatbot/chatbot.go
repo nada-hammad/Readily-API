@@ -22,7 +22,7 @@ var (
 		"Welcome to Readily, your favourite chatbot library! \n" +
 		"Here's a list of commands you can try: \n" +
 		"0- help\n" +
-		"1.0- get book <titleName>\n" +
+		"1.0-  get book <titleName>\n" +
 		"1.1-  get book title (after using command 1)\n" +
 		"1.2-  get book link  (after using command 1)\n" +
 		"1.3-  get book number of pages (after using command 1)\n" +
@@ -389,3 +389,4 @@ func Engage(addr string) error {
 	mux.HandleFunc("/review", withLog(bookHandle))
 	return http.ListenAndServe(addr, cors.CORS(mux))
 }
+

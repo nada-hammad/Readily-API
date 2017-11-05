@@ -12,6 +12,7 @@ var (
 	apiRoot = "http://www.goodreads.com/"
 )
 
+// JSON Holds a JSON object
 type JSON map[string]interface{}
 
 type Response struct {
@@ -34,6 +35,7 @@ type Book struct {
 	Description     string   `xml:"description"`
 	LanguageCode    string   `xml:"language_code"`
 	Publisher       string   `xml:"publisher"`
+	SimilarBooks    []string `xml:"similar_books>book>title"`
 }
 
 func (b Book) Author() string {
@@ -76,6 +78,7 @@ func GetBookByTitle(title, key string) JSON {
 		"description":     response.Book.Description,
 		"language_code":   response.Book.LanguageCode,
 		"publisher":       response.Book.Publisher,
+		"similarBooks":    response.Book.SimilarBooks,
 	}
 
 	return book
@@ -109,6 +112,7 @@ func GetBook(id, key string) JSON {
 		"description":     response.Book.Description,
 		"language_code":   response.Book.LanguageCode,
 		"publisher":       response.Book.Publisher,
+		"similarBooks":    response.Book.SimilarBooks,
 	}
 
 	return book
@@ -135,7 +139,6 @@ func GetAuthorIDbyName(name string, key string) string {
 	return response.Author.Id
 }
 
-// add json
 func GetAuthorInfoById(id, key string) JSON {
 	uri := apiRoot + "author/show/" + id + "?format=xml&key=" + key
 

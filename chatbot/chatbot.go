@@ -20,10 +20,6 @@ var (
 	// WelcomeMessage A constant to hold the welcome message
 	WelcomeMessage = "Welcome, what do you want to order?"
 
-	// sessions = {
-	//   "uuid1" = Session{...},
-	//   ...
-	// }
 	sessions = map[string]Session{}
 
 	processor = sampleProcessor
@@ -32,9 +28,6 @@ var (
 type (
 	// Session Holds info about a session
 	Session map[string]interface{}
-
-	// JSON Holds a JSON object
-	//JSON map[string]interface{}
 
 	// Processor Alias for Process func
 	Processor func(session Session, message string) (string, error)
@@ -182,7 +175,6 @@ func handle(w http.ResponseWriter, r *http.Request) {
 
 func bookHandle(w http.ResponseWriter, r *http.Request) {
 	book := controller.GetBookByTitle("Harry potter", "mpTE2wR5Fx0T3GjYwHpug")
-	//book := controller.GetBookByTitle("The Autobiography of Malcolm X", "mpTE2wR5Fx0T3GjYwHpug")
 	fmt.Println(book)
 	writeJSON(w, book)
 

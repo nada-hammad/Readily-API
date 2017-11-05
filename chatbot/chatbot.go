@@ -17,12 +17,15 @@ import (
 )
 
 var (
-	// WelcomeMessage is a constant to hold the welcome message
-	WelcomeMessage = "" +
-		"Welcome to Readily, your favourite chatbot library! </br>" +
+	// welcomeMessage is a constant to hold the welcome message
+	welcomeMessage = "Welcome to Readily, your favourite chatbot library! <br>" +
+		"Type 'help' to view the list of commands"
+
+	// listOfCommands is a constant to hold the list of commands
+	listOfCommands = "" +
 		"Here's a list of commands you can try: </br>" +
 		"0- help </br>" +
-		"1.0-  get the book <book title> </br>" +
+		"1.0-  get the book [book title] </br>" +
 		"1.1-  get book number of pages (after using command 1) </br>" +
 		"1.2-  get book format (after using command 1) </br>" +
 		"1.3-  get book authors (after using command 1) </br>" +
@@ -30,10 +33,10 @@ var (
 		"1.5-  get book publication year (after using command 1) </br>" +
 		"1.6-  get book description (after using command 1) </br>" +
 		"1.7-  get book language code (after using command 1) </br>" +
-		"1.8- get book publisher (after using command 1) </br>" +
-		"1.9- get book info (after using command 1) </br>" +
+		"1.8-  get book publisher (after using command 1) </br>" +
+		"1.9-  get book info (after using command 1) </br>" +
 		"1.10- get book similar books (after using command 1) </br>" +
-		"2.0-  get the  author <author name> </br>" +
+		"2.0-  get the author [author name] </br>" +
 		"2.1-  get author number of works (after using command 2) </br>" +
 		"2.2-  get author works (after using command 2) </br>" +
 		"2.3-  get author gender (after using command 2) </br>" +
@@ -61,10 +64,16 @@ func chatProcessor(session Session, message string) (string, error) {
 	_, bookFound := session["book"]
 	_, authorFound := session["author"]
 
+	// get help
+	isGetHelp := strings.HasPrefix(strings.ToLower(message), "help")
+	if isGetHelp {
+		return fmt.Sprintf(listOfCommands), nil
+	}
+
 	// get the book <book title>
 	isGetTheBook := strings.HasPrefix(strings.ToLower(message), "get the book")
 	if isGetTheBook {
-		bookTitle := strings.TrimPrefix(message, "get the book ")
+		bookTitle := strings.TrimPrefix(message, "get the book")
 		if len(bookTitle) != 0 {
 			book := controller.GetBookByTitle(bookTitle, key)
 			session["book"] = book
@@ -95,6 +104,7 @@ func chatProcessor(session Session, message string) (string, error) {
 		} else if bookFound {
 			book := session["book"].(controller.JSON)
 			authors := strings.Join(book["authors"].([]string), ", ")
+			similarBooks := strings.Join(book["similarBooks"].([]string), "<br>")
 
 			// get book number of pages
 			if strings.EqualFold(attribute, "number of pages") {
@@ -159,16 +169,23 @@ func chatProcessor(session Session, message string) (string, error) {
 				}
 				return fmt.Sprintf(authors), nil
 
+				// get book similar books
+			} else if strings.EqualFold(similarBooks, "similarBooks") {
+				if strings.EqualFold(similarBooks, "") {
+					return fmt.Sprintf("No similar books are available"), nil
+				}
+				return fmt.Sprintf(similarBooks), nil
+
 				// get book info
 			} else if strings.EqualFold(attribute, "info") {
-				info := "Number of pages: " + book["numPages"].(string) + "\n" +
-					"Format: " + book["format"].(string) + "\n" +
-					"ISBN: " + book["isbn"].(string) + "\n" +
-					"Publication Year: " + book["publicationYear"].(string) + "\n" +
-					"Description: " + book["description"].(string) + "\n" +
-					"Language code: " + book["language_code"].(string) + "\n" +
-					"Publisher: " + book["publisher"].(string) + "\n" +
-					"Authors:\n" + authors
+				info := "Number of pages: " + book["numPages"].(string) + "<br>" +
+					"Format: " + book["format"].(string) + "<br>" +
+					"ISBN: " + book["isbn"].(string) + "<br>" +
+					"Publication Year: " + book["publicationYear"].(string) + "<br>" +
+					"Description: " + book["description"].(string) + "<br>" +
+					"Language code: " + book["language_code"].(string) + "<br>" +
+					"Publisher: " + book["publisher"].(string) + "<br>" +
+					"Authors:<br>" + authors
 
 				return fmt.Sprintf(info), nil
 			}
@@ -182,8 +199,8 @@ func chatProcessor(session Session, message string) (string, error) {
 		reviewsArr := reviews["reviews"].([]controller.Review)
 		allReviews := ""
 		for _, review := range reviewsArr {
-			allReviews += fmt.Sprintf("Book title: %s \n", review.BookTitle)
-			allReviews += fmt.Sprintf("Body: %s \n", review.Body)
+			allReviews += fmt.Sprintf("Book title: %s <br>", review.BookTitle)
+			allReviews += fmt.Sprintf("Body: %s <br>", review.Body)
 		}
 		return allReviews, nil
 	}
@@ -217,7 +234,7 @@ func chatProcessor(session Session, message string) (string, error) {
 			return "", fmt.Errorf("Please enter an author name!")
 		} else if authorFound {
 			author := session["author"].(controller.JSON)
-			works := strings.Join(author["bookTitles"].([]string), "\n")
+			works := strings.Join(author["bookTitles"].([]string), "<br>")
 
 			// get author number of works
 			if strings.EqualFold(attribute, "number of works") {
@@ -249,18 +266,18 @@ func chatProcessor(session Session, message string) (string, error) {
 
 				// get author info
 			} else if strings.EqualFold(attribute, "info") {
-				info := "Name: " + author["name"].(string) + "\n" +
-					"Number of works: " + author["worksCount"].(string) + "\n" +
-					"gender: " + author["gender"].(string) + "\n" +
-					"hometown: " + author["hometown"].(string) + "\n" +
-					"works:\n" + works
+				info := "Name: " + author["name"].(string) + "<br>" +
+					"Number of works: " + author["worksCount"].(string) + "<br>" +
+					"Gender: " + author["gender"].(string) + "<br>" +
+					"Hometown: " + author["hometown"].(string) + "<br>" +
+					"Works:<br>" + works
 
 				return fmt.Sprintf(info), nil
 			}
 		}
 	}
 
-	return fmt.Sprintf(WelcomeMessage), nil
+	return fmt.Sprintf("Invalid command. Type 'help' for list of commands"), nil
 }
 
 // withLog wraps HandlerFuncs to log requests to Stdout
@@ -302,7 +319,7 @@ func handleWelcome(w http.ResponseWriter, r *http.Request) {
 	// Write a JSON containing the welcome message and the generated UUID
 	writeJSON(w, controller.JSON{
 		"uuid":    uuid,
-		"message": WelcomeMessage,
+		"message": welcomeMessage,
 	})
 }
 

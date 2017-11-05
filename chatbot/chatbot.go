@@ -52,10 +52,10 @@ var (
 )
 
 type (
-	// Session Holds info about a session
+	// Session holds info about a session
 	Session map[string]interface{}
 
-	// Processor Alias for Process func
+	// Processor alias for processFunc
 	Processor func(session Session, message string) (string, error)
 )
 
@@ -77,7 +77,7 @@ func chatProcessor(session Session, message string) (string, error) {
 		if len(bookTitle) != 0 {
 			book := controller.GetBookByTitle(bookTitle, key)
 			session["book"] = book
-			return fmt.Sprintf("OK, I found the book %s", book["title"]), nil
+			return fmt.Sprintf("OK, I found the book %s. What do you want to know?", book["title"]), nil
 		}
 		return "", fmt.Errorf("Please enter a book title!")
 
@@ -97,6 +97,7 @@ func chatProcessor(session Session, message string) (string, error) {
 				strings.EqualFold(attribute, "publication year") ||
 				strings.EqualFold(attribute, "description") ||
 				strings.EqualFold(attribute, "language code") ||
+				strings.EqualFold(attribute, "similar books") ||
 				strings.EqualFold(attribute, "publisher")))
 
 		if isValidAttribute && !bookFound {
@@ -170,7 +171,7 @@ func chatProcessor(session Session, message string) (string, error) {
 				return fmt.Sprintf(authors), nil
 
 				// get book similar books
-			} else if strings.EqualFold(similarBooks, "similarBooks") {
+			} else if strings.EqualFold(attribute, "similar books") {
 				if strings.EqualFold(similarBooks, "") {
 					return fmt.Sprintf("No similar books are available"), nil
 				}
@@ -277,7 +278,7 @@ func chatProcessor(session Session, message string) (string, error) {
 		}
 	}
 
-	return fmt.Sprintf("Invalid command. Type 'help' for list of commands"), nil
+	return fmt.Sprintf("Invalid command. Type 'help' for the list of commands."), nil
 }
 
 // withLog wraps HandlerFuncs to log requests to Stdout
@@ -301,8 +302,8 @@ func writeJSON(w http.ResponseWriter, data controller.JSON) {
 	json.NewEncoder(w).Encode(data)
 }
 
-// ProcessFunc Sets the processor of the chatbot
-func ProcessFunc(p Processor) {
+// ProcessFunc sets the processor of the chatbot
+func processFunc(p Processor) {
 	processor = p
 }
 

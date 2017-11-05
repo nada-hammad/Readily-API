@@ -18,8 +18,30 @@ import (
 
 var (
 	// WelcomeMessage A constant to hold the welcome message
-	WelcomeMessage = "Welcome, what do you want to order?"
-	key            = "mpTE2wR5Fx0T3GjYwHpug"
+	WelcomeMessage = "" +
+		"Welcome to Readily, your favourite chatbot library! \n" +
+		"Here's a list of commands you can try: \n" +
+		"0- help\n" +
+		"1.0- get book <titleName>\n" +
+		"1.1-  get book title (after using command 1)\n" +
+		"1.2-  get book link  (after using command 1)\n" +
+		"1.3-  get book number of pages (after using command 1)\n" +
+		"1.4-  get book format (after using command 1)\n" +
+		"1.5-  get book authors (after using command 1)\n" +
+		"1.6-  get book average rating (after using command 1)\n" +
+		"1.7-  get book publication year (after using command 1)\n" +
+		"1.8-  get book description (after using command 1)\n" +
+		"1.9-  get book language code (after using command 1)\n" +
+		"1.10- get book publisher (after using command 1)\n" +
+		"1.11- get book similar books (after using command 1)\n" +
+		"2.0-  get author <authorName>\n" +
+		"2.1-  get author works count\n" +
+		"2.2-  get author gender\n" +
+		"2.3-  get author hometown\n" +
+		"2.4-  get author book titles\n" +
+		"3-    get latest reviews\n"
+
+	key = "mpTE2wR5Fx0T3GjYwHpug"
 
 	// sessions = {
 	//   "uuid1" = Session{...},
@@ -66,7 +88,7 @@ func sampleProcessor(session Session, message string) (string, error) {
 		return allReviews, nil
 	}
 
-	return fmt.Sprintf("So, you want %s! What else?", strings.ToLower("test")), nil
+	return fmt.Sprintf(WelcomeMessage), nil
 }
 
 // withLog Wraps HandlerFuncs to log requests to Stdout

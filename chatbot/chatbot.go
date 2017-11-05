@@ -67,13 +67,13 @@ type (
 func sampleProcessor(session Session, message string) (string, error) {
 
 	// check if there's a book and/or an author stored in the session
-	//_, bookFound := session["book"]
+	_, bookFound := session["book"]
 	_, authorFound := session["author"]
 
 	// book requests
-	isGetBook := strings.HasPrefix(strings.ToLower(message), "get book")
-	if isGetBook {
-		bookTitle := strings.TrimPrefix(message, "get book")
+	isGetTheBook := strings.HasPrefix(strings.ToLower(message), "get the book")
+	if isGetTheBook {
+		bookTitle := strings.TrimPrefix(message, "get the book")
 		if len(bookTitle) != 0 {
 			book := controller.GetBookByTitle(bookTitle, key)
 			session["book"] = book // book is a JSON map
@@ -162,6 +162,93 @@ func sampleProcessor(session Session, message string) (string, error) {
 					"gender: " + author["gender"].(string) + "\n" +
 					"hometown: " + author["hometown"].(string) + "\n" +
 					"works:\n" + works
+
+				return fmt.Sprintf(info), nil
+			}
+		}
+	}
+	isGetBook := strings.HasPrefix(strings.ToLower(message), "get book")
+	if isGetBook {
+		attribute := strings.TrimPrefix(message, "get book ")
+
+		isValidAttribute := (len(attribute) != 0 &&
+			(strings.EqualFold(attribute, "numPages") ||
+				strings.EqualFold(attribute, "format") ||
+				strings.EqualFold(attribute, "authors") ||
+				strings.EqualFold(attribute, "isbn") ||
+				strings.EqualFold(attribute, "rating") ||
+				strings.EqualFold(attribute, "publicationYear") ||
+				strings.EqualFold(attribute, "description") ||
+				strings.EqualFold(attribute, "language_code") ||
+				strings.EqualFold(attribute, "publisher")))
+
+		if isValidAttribute && !bookFound {
+			return "", fmt.Errorf("Please enter an author name!")
+		} else if bookFound {
+			book := session["book"].(controller.JSON)
+			authors := strings.Join(book["authors"].([]string), ", ")
+
+			// get author number of works
+			if strings.EqualFold(attribute, "number of pages") {
+				if strings.EqualFold(book["numPages"].(string), "") {
+					return fmt.Sprintf("The book's number of pages is not available"), nil
+				}
+				return fmt.Sprintf(book["numPages"].(string)), nil
+
+				// get author gender
+			} else if strings.EqualFold(attribute, "format") {
+				if strings.EqualFold(book["format"].(string), "") {
+					return fmt.Sprintf("The book's format is not available"), nil
+				}
+				return fmt.Sprintf(book["format"].(string)), nil
+
+				// get author hometown
+			} else if strings.EqualFold(attribute, "isbn") {
+				if strings.EqualFold(book["isbn"].(string), "") {
+					return fmt.Sprintf("The book's isbn is not available"), nil
+				}
+				return fmt.Sprintf(book["isbn"].(string)), nil
+				// get author works
+			}else if strings.EqualFold(attribute, "rating") {
+				if strings.EqualFold(book["rating"].(string), "") {
+					return fmt.Sprintf("The book's rating is not available"), nil
+				}
+				return fmt.Sprintf(book["publicationYear"].(string)), nil
+				// get author works
+			} else if strings.EqualFold(attribute, "publication year") {
+				if strings.EqualFold(book["publicationYear"].(string), "") {
+					return fmt.Sprintf("The book's publication year is not available"), nil
+				}
+				return fmt.Sprintf(book["publicationYear"].(string)), nil
+				// get author works
+			}else if strings.EqualFold(attribute, "description") {
+				if strings.EqualFold(book["description"].(string), "") {
+					return fmt.Sprintf("The book's description is not available"), nil
+				}
+				return fmt.Sprintf(book["description"].(string)), nil
+				// get author works
+			}else if strings.EqualFold(attribute, "language code") {
+				if strings.EqualFold(book["language_code"].(string), "") {
+					return fmt.Sprintf("The book's language_code is not available"), nil
+				}
+				return fmt.Sprintf(book["language_code"].(string)), nil
+				// get author works
+			}else if strings.EqualFold(attribute, "authors") {
+				if strings.EqualFold(authors, "") {
+					return fmt.Sprintf("The book's authors are not available"), nil
+				}
+				return fmt.Sprintf(authors), nil
+
+				// get author info
+			} else if strings.EqualFold(attribute, "info") {
+				info := "Number of pages: " + book["numPages"].(string) + "\n" +
+					"Format: " + book["format"].(string) + "\n" +
+					"ISBN: " + book["isbn"].(string) + "\n" +
+					"Publication Year: " + book["publicationYear"].(string) + "\n" +
+					"Description: " + book["description"].(string) + "\n" +
+					"Language code: " + book["language_code"].(string) + "\n" +
+					"Publisher: " + book["publisher"].(string) + "\n" +
+					"Authors:\n" + authors
 
 				return fmt.Sprintf(info), nil
 			}

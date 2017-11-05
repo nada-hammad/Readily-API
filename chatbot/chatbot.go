@@ -73,7 +73,7 @@ func sampleProcessor(session Session, message string) (string, error) {
 		return allReviews, nil
 	}
 
-	// author requests
+	// get the author <author name>
 	isGetTheAuthor := strings.HasPrefix(strings.ToLower(message), "get the author")
 	if isGetTheAuthor {
 		authorName := strings.TrimPrefix(message, "get the author")
@@ -81,11 +81,12 @@ func sampleProcessor(session Session, message string) (string, error) {
 			author := controller.GetAuthorInfo(authorName, key)
 			session["author"] = author
 			return fmt.Sprintf("OK, I found the author %s! What do you want to know?", author["name"]), nil
-		} else {
-			return "", fmt.Errorf("Please enter an author name!")
 		}
+		return "", fmt.Errorf("Please enter an author name!")
+
 	}
 
+	// get author <attribute>
 	isGetAuthor := strings.HasPrefix(strings.ToLower(message), "get author")
 	if isGetAuthor {
 		attribute := strings.TrimPrefix(message, "get author ")
@@ -103,20 +104,41 @@ func sampleProcessor(session Session, message string) (string, error) {
 			author := session["author"].(controller.JSON)
 			works := strings.Join(author["bookTitles"].([]string), "\n")
 
+			// get author number of works
 			if strings.EqualFold(attribute, "number of works") {
+				if strings.EqualFold(author["worksCount"].(string), "") {
+					return fmt.Sprintf("The author's number of works is not available"), nil
+				}
 				return fmt.Sprintf(author["worksCount"].(string)), nil
+
+				// get author gender
 			} else if strings.EqualFold(attribute, "gender") {
+				if strings.EqualFold(author["gender"].(string), "") {
+					return fmt.Sprintf("The author's gender is not available"), nil
+				}
 				return fmt.Sprintf(author["gender"].(string)), nil
+
+				// get author hometown
 			} else if strings.EqualFold(attribute, "hometown") {
+				if strings.EqualFold(author["hometown"].(string), "") {
+					return fmt.Sprintf("The author's hometown is not available"), nil
+				}
 				return fmt.Sprintf(author["hometown"].(string)), nil
+
+				// get author works
 			} else if strings.EqualFold(attribute, "works") {
-				return fmt.Sprintf("\n" + works), nil
+				if strings.EqualFold(works, "") {
+					return fmt.Sprintf("The author's works are not available"), nil
+				}
+				return fmt.Sprintf(works), nil
+
+				// get author info
 			} else if strings.EqualFold(attribute, "info") {
 				info := "Name: " + author["name"].(string) + "\n" +
 					"Number of works: " + author["worksCount"].(string) + "\n" +
 					"gender: " + author["gender"].(string) + "\n" +
 					"hometown: " + author["hometown"].(string) + "\n" +
-					"works: " + works
+					"works:\n" + works
 
 				return fmt.Sprintf(info), nil
 			}

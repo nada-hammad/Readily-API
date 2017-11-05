@@ -2,215 +2,89 @@ package controller
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
-	"time"
 )
 
 var (
 	apiRoot = "http://www.goodreads.com/"
 )
 
+// JSON Holds a JSON object
 type JSON map[string]interface{}
 
 type Response struct {
-	User    User     `xml:"user"`
+	Author  Author   `xml:"author"`
 	Book    Book     `xml:"book"`
 	Reviews []Review `xml:"reviews>review"`
 }
 
-type User struct {
-	ID            string       `xml:"id"`
-	Name          string       `xml:"name"`
-	About         string       `xml:"about"`
-	Link          string       `xml:"link"`
-	ImageURL      string       `xml:"image_url"`
-	SmallImageURL string       `xml:"small_image_url"`
-	Location      string       `xml:"location"`
-	LastActive    string       `xml:"last_active"`
-	ReviewCount   int          `xml:"reviews_count"`
-	Statuses      []UserStatus `xml:"user_statuses>user_status"`
-	Shelves       []Shelf      `xml:"user_shelves>user_shelf"`
-	LastRead      []Review
-}
-
-func (u User) ReadingShelf() Shelf {
-	for _, shelf := range u.Shelves {
-		if shelf.Name == "currently-reading" {
-			return shelf
-		}
-	}
-
-	return Shelf{}
-}
-
-func (u User) ReadShelf() Shelf {
-	for _, shelf := range u.Shelves {
-		if shelf.Name == "read" {
-			return shelf
-		}
-	}
-
-	return Shelf{}
-}
-
-func (u User) ToReadShelf() Shelf {
-	for _, shelf := range u.Shelves {
-		if shelf.Name == "to-read" {
-			return shelf
-		}
-	}
-
-	return Shelf{}
-}
-
-type Shelf struct {
-	ID        string `xml:"id"`
-	BookCount string `xml:"book_count"`
-	Name      string `xml:"name"`
-}
-
-type UserStatus struct {
-	Page    int    `xml:"page"`
-	Percent int    `xml:"percent"`
-	Updated string `xml:"updated_at"`
-	Book    Book   `xml:"book"`
-}
-
-func (u UserStatus) UpdatedRelative() string {
-	return relativeDate(u.Updated)
-}
-
 type Book struct {
-	ID            string   `xml:"id"`
-	Title         string   `xml:"title"`
-	Link          string   `xml:"link"`
-	ImageURL      string   `xml:"image_url"`
-	NumPages      string   `xml:"num_pages"`
-	Format        string   `xml:"format"`
-	Authors       []Author `xml:"authors>author"`
-	ISBN          string   `xml:"isbn"`
-	AverageRating string   `xml:"average_rating"`
+	ID              string   `xml:"id"`
+	Title           string   `xml:"title"`
+	Link            string   `xml:"link"`
+	ImageURL        string   `xml:"image_url"`
+	NumPages        string   `xml:"num_pages"`
+	Format          string   `xml:"format"`
+	Authors         []string `xml:"authors>author>name"`
+	ISBN            string   `xml:"isbn"`
+	AverageRating   string   `xml:"average_rating"`
+	PublicationYear string   `xml:"publication_year"`
+	Description     string   `xml:"description"`
+	LanguageCode    string   `xml:"language_code"`
+	Publisher       string   `xml:"publisher"`
+	SimilarBooks    []string `xml:"similar_books>book>title"`
 }
 
-func (b Book) Author() Author {
+func (b Book) Author() string {
 	return b.Authors[0]
 }
 
 type Author struct {
-	ID   string `xml:"id"`
-	Name string `xml:"name"`
-	Link string `xml:"link"`
+	Id         string   `xml:"id,attr"`
+	ID         string   `xml:"id"`
+	Name       string   `xml:"name"`
+	WorksCount string   `xml:"works_count"`
+	Gender     string   `xml:"gender"`
+	Hometown   string   `xml:"hometown"`
+	BookTitles []string `xml:"books>book>title"`
 }
 
 type Review struct {
-	Book   Book   `xml:"book"`
-	Rating int    `xml:"rating"`
-	ReadAt string `xml:"read_at"`
-	Link   string `xml:"link"`
+	Body      string `xml:"body"`
+	BookTitle string `xml:"book>title"`
 }
 
-func (r Review) FullStars() []bool {
-	return make([]bool, r.Rating)
-}
+// API Calls
 
-func (r Review) EmptyStars() []bool {
-	return make([]bool, 5-r.Rating)
-}
-
-func (r Review) ReadAtShort() string {
-	date, err := parseDate(r.ReadAt)
-	if err != nil {
-		return ""
-	}
-
-	return (string)(date.Format("2 Jan 2006"))
-}
-
-func (r Review) ReadAtRelative() string {
-	return relativeDate(r.ReadAt)
-}
-
-// PUBLIC
-
-// func GetUser(id, key string, limit int) *User {
-// 	uri := apiRoot + "user/show/" + id + ".xml?key=" + key
-// 	response := &Response{}
-// 	getData(uri, response)
-
-// 	for i := range response.User.Statuses {
-// 		status := &response.User.Statuses[i]
-// 		bookid := status.Book.ID
-// 		book := GetBook(bookid, key)
-//		// error: because book is now of type json
-// 		status.Book = book
-// 	}
-
-// 	if len(response.User.Statuses) >= limit {
-// 		response.User.Statuses = response.User.Statuses[:limit]
-// 	} else {
-// 		remaining := limit - len(response.User.Statuses)
-// 		response.User.LastRead = GetLastRead(id, key, remaining)
-// 	}
-
-// 	return &response.User
-// }
-
-// func GetBook(id, key string) Book {
-// 	uri := apiRoot + "book/show/" + id + ".xml?key=" + key
-// 	response := &Response{}
-// 	getData(uri, response)
-
-// 	return response.Book
-// }
-
-// return json object
 func GetBookByTitle(title, key string) JSON {
 	title = url.QueryEscape(title)
 	uri := apiRoot + "book/title.xml?key=" + key + "&title=" + title
 	response := &Response{}
 	getData(uri, response)
 
-	json := JSON{
-		"id":       response.Book.ID,
-		"title":    response.Book.Title,
-		"link":     response.Book.Link,
-		"imageURL": response.Book.ImageURL,
-		"numPages": response.Book.NumPages,
-		"format":   response.Book.Format,
-		"authors":  response.Book.Authors,
-		"isbn":     response.Book.ISBN,
-		"rating":   response.Book.AverageRating,
+	book := JSON{
+		"title":           response.Book.Title,
+		"link":            response.Book.Link,
+		"imageURL":        response.Book.ImageURL,
+		"numPages":        response.Book.NumPages,
+		"format":          response.Book.Format,
+		"authors":         response.Book.Authors,
+		"isbn":            response.Book.ISBN,
+		"rating":          response.Book.AverageRating,
+		"publicationYear": response.Book.PublicationYear,
+		"description":     response.Book.Description,
+		"language_code":   response.Book.LanguageCode,
+		"publisher":       response.Book.Publisher,
+		"similarBooks":    response.Book.SimilarBooks,
 	}
 
-	return json
+	return book
 }
 
-// return json object
-func GetBook(id, key string) JSON {
-	uri := apiRoot + "book/show/" + id + ".xml?key=" + key
-	response := &Response{}
-	getData(uri, response)
-
-	json := JSON{
-		"id":       response.Book.ID,
-		"title":    response.Book.Title,
-		"link":     response.Book.Link,
-		"imageURL": response.Book.ImageURL,
-		"numPages": response.Book.NumPages,
-		"format":   response.Book.Format,
-		"authors":  response.Book.Authors,
-		"isbn":     response.Book.ISBN,
-		"rating":   response.Book.AverageRating,
-	}
-
-	return json
-}
-
+// not used
 func GetBookId(isbn, key string) string {
 	uri := apiRoot + "book/isbn/" + isbn + ".xml?key=" + key
 	response := &Response{}
@@ -218,41 +92,78 @@ func GetBookId(isbn, key string) string {
 	return response.Book.ID
 }
 
-// type jsonResponse struct {
-// 		review string
-// 	}
-// func GetBookReview(id, key string) interface{}{
-// //http://www.goodreads.com/book/show?format=json&key=mpTE2wR5Fx0T3GjYwHpug&id=11125
-// 	uri := apiRoot + "book/show?format=json&key=" + key + "&id=11125"
-// //+ id
-//   fmt.Println(uri)
-//   response:= getRequest(uri)
-//   dec:=json.NewDecoder(strings.NewReader(response))
-//  for {
-//  		var m jsonResponse
-//  		if err := dec.Decode(&m); err == io.EOF {
-//  			break
-//  		} else if err != nil {
-//  			log.Fatal(err)
-//  		}
-//  		fmt.Printf("%s: %s\n", m.review)
-//  	}
-// //	response := &Response{}
-// //	getData(uri, response)
-// 	return response
-// }
+// not used
+func GetBook(id, key string) JSON {
+	uri := apiRoot + "book/show/" + id + ".xml?key=" + key
+	response := &Response{}
+	getData(uri, response)
 
-func GetLastRead(id, key string, limit int) []Review {
-	l := strconv.Itoa(limit)
-	uri := apiRoot + "review/list/" + id + ".xml?key=" + key + "&v=2&shelf=read&sort=date_read&order=d&per_page=" + l
+	book := JSON{
+		"id":              response.Book.ID,
+		"title":           response.Book.Title,
+		"link":            response.Book.Link,
+		"imageURL":        response.Book.ImageURL,
+		"numPages":        response.Book.NumPages,
+		"format":          response.Book.Format,
+		"authors":         response.Book.Authors,
+		"isbn":            response.Book.ISBN,
+		"rating":          response.Book.AverageRating,
+		"publicationYear": response.Book.PublicationYear,
+		"description":     response.Book.Description,
+		"language_code":   response.Book.LanguageCode,
+		"publisher":       response.Book.Publisher,
+		"similarBooks":    response.Book.SimilarBooks,
+	}
+
+	return book
+}
+
+func GetRecentReviews(key string) JSON {
+	uri := apiRoot + "review/recent_reviews?format=xml&key=" + key
+	response := &Response{}
+	getData(uri, response)
+
+	reviews := JSON{
+		"reviews": response.Reviews,
+	}
+
+	return reviews
+}
+
+func GetAuthorIDbyName(name string, key string) string {
+	uri := apiRoot + "api/author_url/" + name + "?key=" + key
 
 	response := &Response{}
 	getData(uri, response)
 
-	return response.Reviews
+	return response.Author.Id
 }
 
-// PRIVATE
+func GetAuthorInfoById(id, key string) JSON {
+	uri := apiRoot + "author/show/" + id + "?format=xml&key=" + key
+
+	response := &Response{}
+	getData(uri, response)
+
+	author := JSON{
+		"name":       response.Author.Name,
+		"worksCount": response.Author.WorksCount,
+		"gender":     response.Author.Gender,
+		"hometown":   response.Author.Hometown,
+		"bookTitles": response.Author.BookTitles,
+	}
+
+	return author
+}
+
+func GetAuthorInfo(name string, key string) JSON {
+	id := GetAuthorIDbyName(name, key)
+	author := GetAuthorInfoById(id, key)
+
+	return author
+}
+
+// Data Handling
 
 func getData(uri string, i interface{}) {
 	data := getRequest(uri)
@@ -278,46 +189,5 @@ func xmlUnmarshal(b []byte, i interface{}) {
 	err := xml.Unmarshal(b, i)
 	if err != nil {
 		log.Fatal(err)
-	}
-}
-
-func parseDate(s string) (time.Time, error) {
-	date, err := time.Parse(time.RFC3339, s)
-	if err != nil {
-		date, err = time.Parse(time.RubyDate, s)
-		if err != nil {
-			return time.Time{}, err
-		}
-	}
-
-	return date, nil
-}
-
-func relativeDate(d string) string {
-	date, err := parseDate(d)
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-
-	s := time.Now().Sub(date)
-
-	days := int(s / (24 * time.Hour))
-	if days > 1 {
-		return fmt.Sprintf("%v days ago", days)
-	} else if days == 1 {
-		return fmt.Sprintf("%v day ago", days)
-	}
-
-	hours := int(s / time.Hour)
-	if hours > 1 {
-		return fmt.Sprintf("%v hours ago", hours)
-	}
-
-	minutes := int(s / time.Minute)
-	if minutes > 2 {
-		return fmt.Sprintf("%v minutes ago", minutes)
-	} else {
-		return "Just now"
 	}
 }

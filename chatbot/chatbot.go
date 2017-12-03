@@ -23,26 +23,26 @@ var (
 
 	// listOfCommands is a constant to hold the list of commands
 	listOfCommands = "" +
-		"Here's a list of commands you can try: </br>" +
-		"0- help </br>" +
-		"1.0-  get the book [book title] </br>" +
-		"1.1-  get book number of pages (after using command 1) </br>" +
-		"1.2-  get book format (after using command 1) </br>" +
-		"1.3-  get book authors (after using command 1) </br>" +
-		"1.4-  get book rating (after using command 1) </br>" +
-		"1.5-  get book publication year (after using command 1) </br>" +
-		"1.6-  get book description (after using command 1) </br>" +
-		"1.7-  get book language code (after using command 1) </br>" +
-		"1.8-  get book publisher (after using command 1) </br>" +
-		"1.9-  get book info (after using command 1) </br>" +
-		"1.10- get book similar books (after using command 1) </br>" +
-		"2.0-  get the author [author name] </br>" +
-		"2.1-  get author number of works (after using command 2) </br>" +
-		"2.2-  get author works (after using command 2) </br>" +
-		"2.3-  get author gender (after using command 2) </br>" +
-		"2.4-  get author hometown (after using command) 2) </br>" +
-		"2.5-  get author info (after using command 2) </br>" +
-		"3-    get latest reviews (after using command 2) </br>"
+		"Here's a list of commands you can try: \n" +
+		"0- help \n" +
+		"1.0-  get the book [book title] \n" +
+		"1.1-  get book number of pages (after using command 1) \n" +
+		"1.2-  get book format (after using command 1) \n" +
+		"1.3-  get book authors (after using command 1) \n" +
+		"1.4-  get book rating (after using command 1) \n" +
+		"1.5-  get book publication year (after using command 1) \n" +
+		"1.6-  get book description (after using command 1) \n" +
+		"1.7-  get book language code (after using command 1) \n" +
+		"1.8-  get book publisher (after using command 1) \n" +
+		"1.9-  get book info (after using command 1) \n" +
+		"1.10- get book similar books (after using command 1) \n" +
+		"2.0-  get the author [author name] \n" +
+		"2.1-  get author number of works (after using command 2) \n" +
+		"2.2-  get author works (after using command 2) \n" +
+		"2.3-  get author gender (after using command 2) \n" +
+		"2.4-  get author hometown (after using command) 2) \n" +
+		"2.5-  get author info (after using command 2) \n" +
+		"3-    get latest reviews (after using command 2) \n"
 
 	key = "mpTE2wR5Fx0T3GjYwHpug"
 
@@ -105,7 +105,7 @@ func chatProcessor(session Session, message string) (string, error) {
 		} else if bookFound {
 			book := session["book"].(controller.JSON)
 			authors := strings.Join(book["authors"].([]string), ", ")
-			similarBooks := strings.Join(book["similarBooks"].([]string), "<br>")
+			similarBooks := strings.Join(book["similarBooks"].([]string), "\n")
 
 			// get book number of pages
 			if strings.EqualFold(attribute, "number of pages") {
@@ -179,14 +179,14 @@ func chatProcessor(session Session, message string) (string, error) {
 
 				// get book info
 			} else if strings.EqualFold(attribute, "info") {
-				info := "Number of pages: " + book["numPages"].(string) + "<br>" +
-					"Format: " + book["format"].(string) + "<br>" +
-					"ISBN: " + book["isbn"].(string) + "<br>" +
-					"Publication Year: " + book["publicationYear"].(string) + "<br>" +
-					"Description: " + book["description"].(string) + "<br>" +
-					"Language code: " + book["language_code"].(string) + "<br>" +
-					"Publisher: " + book["publisher"].(string) + "<br>" +
-					"Authors:<br>" + authors
+				info := "Number of pages: " + book["numPages"].(string) + "\n" +
+					"Format: " + book["format"].(string) + "\n" +
+					"ISBN: " + book["isbn"].(string) + "\n" +
+					"Publication Year: " + book["publicationYear"].(string) + "\n" +
+					"Description: " + book["description"].(string) + "\n" +
+					"Language code: " + book["language_code"].(string) + "\n" +
+					"Publisher: " + book["publisher"].(string) + "\n" +
+					"Authors:\n" + authors
 
 				return fmt.Sprintf(info), nil
 			}
@@ -200,8 +200,8 @@ func chatProcessor(session Session, message string) (string, error) {
 		reviewsArr := reviews["reviews"].([]controller.Review)
 		allReviews := ""
 		for _, review := range reviewsArr {
-			allReviews += fmt.Sprintf("Book title: %s <br>", review.BookTitle)
-			allReviews += fmt.Sprintf("Body: %s <br>", review.Body)
+			allReviews += fmt.Sprintf("Book title: %s \n", review.BookTitle)
+			allReviews += fmt.Sprintf("Body: %s \n", review.Body)
 		}
 		return allReviews, nil
 	}
@@ -235,7 +235,7 @@ func chatProcessor(session Session, message string) (string, error) {
 			return "", fmt.Errorf("Please enter an author name!")
 		} else if authorFound {
 			author := session["author"].(controller.JSON)
-			works := strings.Join(author["bookTitles"].([]string), "<br>")
+			works := strings.Join(author["bookTitles"].([]string), "\n")
 
 			// get author number of works
 			if strings.EqualFold(attribute, "number of works") {
@@ -267,11 +267,11 @@ func chatProcessor(session Session, message string) (string, error) {
 
 				// get author info
 			} else if strings.EqualFold(attribute, "info") {
-				info := "Name: " + author["name"].(string) + "<br>" +
-					"Number of works: " + author["worksCount"].(string) + "<br>" +
-					"Gender: " + author["gender"].(string) + "<br>" +
-					"Hometown: " + author["hometown"].(string) + "<br>" +
-					"Works:<br>" + works
+				info := "Name: " + author["name"].(string) + "\n" +
+					"Number of works: " + author["worksCount"].(string) + "\n" +
+					"Gender: " + author["gender"].(string) + "\n" +
+					"Hometown: " + author["hometown"].(string) + "\n" +
+					"Works:\n" + works
 
 				return fmt.Sprintf(info), nil
 			}

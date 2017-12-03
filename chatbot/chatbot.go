@@ -18,7 +18,7 @@ import (
 
 var (
 	// welcomeMessage is a constant to hold the welcome message
-	welcomeMessage = "Welcome to Readily, your favourite chatbot library! <br>" +
+	welcomeMessage = "Welcome to Readily, your favourite chatbot library! \n" +
 		"Type 'help' to view the list of commands"
 
 	// listOfCommands is a constant to hold the list of commands
